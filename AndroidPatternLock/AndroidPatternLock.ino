@@ -58,7 +58,8 @@ void setup() {
 void loop() {
   ActualizarCirculos();
   ActualizarMouse();
-  delay(100);
+  DibujarExtra();
+ // delay(100);
 
 }
 
@@ -84,9 +85,21 @@ void ActualizarMouse() {
       Puntos[IndicePuntos] = i;
       Serial.println(i);
       IndicePuntos++;
-
     }
   }
+}
+
+void DibujarExtra() {
+  Pantalla.fillRect(0, 0, 240, 30, WHITE);
+  Pantalla.setCursor(30, 10);
+  Pantalla.setTextSize(2);
+  Pantalla.setTextColor(BLACK);
+  Pantalla.print("X ");
+  Pantalla.print(X);
+  Pantalla.print(" Y ");
+  Pantalla.print(Y);
+  Pantalla.print(" Z ");
+  Pantalla.println(Z);
 }
 
 void ActualizarCirculos() {
