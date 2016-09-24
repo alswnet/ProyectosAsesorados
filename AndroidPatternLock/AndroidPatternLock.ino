@@ -1,6 +1,6 @@
 #include <Adafruit_GFX.h> // Libreria de graficos
 #include <Adafruit_TFTLCD.h> // Libreria de LCD
-#include <TouchScreen.h> // Libreria del panel tactil
+#include <TouchScreen.h> // Libreria del panel tactil -- https://learn.adafruit.com/2-8-tft-touchscreen/touchscreen
 
 #define YP A1 // Pin analogico A1 para ADC
 #define XM A2 // Pin analogico A2 para ADC
@@ -45,7 +45,19 @@ int Puntos[9] = {0, 0, 0, 0, 0, 0, 0 , 0, 0};
 int IndicePuntos = 0;
 int PuntosCorrectos[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
-int X ;
+int RadioPequeno = 5;
+int RadioGrande = 25;
+
+int Activando = 0;
+int EstaVerde = 1;
+
+int TiempoPasado;
+int TiempoBonba = 7000;
+int TiempoFalta;
+
+// millis()
+
+int X;
 int Y;
 int Z;
 void setup() {
@@ -56,11 +68,50 @@ void setup() {
 }
 
 void loop() {
+  if ( HayDedo() && Activando == 0) {
+    BuscandoDedo();
+  }
+
+  if (Activando == 1) {
+    BuscandoDedo();
+    TiempoFalta = TiempoBonba - (millis() - TiempoPasado);
+    if (TiempoFalta <= 0) {
+      IndicePuntos = 0;
+      Activando = 0;
+    }
+    for (int i = 0; i < IndicePuntos; i++) {
+      Serial.print( Puntos[i]);
+      Serial.print("-");
+    }
+    Serial.println();
+  }
+
   ActualizarCirculos();
   ActualizarMouse();
   DibujarExtra();
- // delay(100);
+  //delay(100);
+}
 
+void BuscandoDedo() {
+  for (int i = 0; i < 9; i++) {
+    if (Distancia(PX[i], PY[i]) < RadioGrande) {
+      for (int j = 0; j < IndicePuntos ; j++) {
+        if (Puntos[j] == i)
+          return 0;
+      }
+      TiempoPasado = millis();
+      Activando = 1;
+      Puntos[IndicePuntos] = i;
+      IndicePuntos++;
+    }
+  }
+}
+
+int HayDedo() {
+  if (Z > 0) {
+    return 1;
+  }
+  return 0;
 }
 
 void ActualizarMouse() {
@@ -80,35 +131,35 @@ void ActualizarMouse() {
   Serial.print(Y);
   Serial.print(" z");
   Serial.println(Z);
-  for (int i = 0; i < 9; i++) {
-    if (Distancia(PX[i], PY[i]) < 25) {
-      Puntos[IndicePuntos] = i;
-      Serial.println(i);
-      IndicePuntos++;
-    }
-  }
+
 }
 
 void DibujarExtra() {
   Pantalla.fillRect(0, 0, 240, 30, WHITE);
-  Pantalla.setCursor(30, 10);
+  Pantalla.setCursor(10, 10);
   Pantalla.setTextSize(2);
   Pantalla.setTextColor(BLACK);
-  Pantalla.print("X ");
+  Pantalla.print("X");
   Pantalla.print(X);
-  Pantalla.print(" Y ");
+  Pantalla.print(" Y");
   Pantalla.print(Y);
-  Pantalla.print(" Z ");
-  Pantalla.println(Z);
+  Pantalla.print(" Z");
+  Pantalla.print(Z);
+  Pantalla.print(" T");
+  int TiempoFalta = TiempoBonba - (millis() - TiempoPasado);
+  if (TiempoFalta > 0)
+    Pantalla.print( float(TiempoFalta / 1000));
+  else
+    Pantalla.println(0);
 }
 
 void ActualizarCirculos() {
   for (int i = 0; i < 9; i++) {
-    Pantalla.fillCircle(PX[i], PY[i], 5, BLACK);
-    Pantalla.drawCircle(PX[i], PY[i], 25, BLACK);
+    Pantalla.fillCircle(PX[i], PY[i], RadioPequeno, BLACK);
+    Pantalla.drawCircle(PX[i], PY[i], RadioGrande, BLACK);
   }
 }
 
 int Distancia(int x, int y) {
-  return  sqrt(pow((x - X), 2) + pow(y - Y, 2));
+  return sqrt(pow((x - X), 2) + pow(y - Y, 2));
 }
