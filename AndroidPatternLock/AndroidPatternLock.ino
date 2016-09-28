@@ -43,7 +43,8 @@ int PX[9]  = {60, 120, 180, 60, 120, 180, 60, 120, 180};
 int PY[9] = {90, 90, 90, 180, 180, 180,  270, 270, 270};
 int Puntos[9] = {0, 0, 0, 0, 0, 0, 0 , 0, 0};
 int IndicePuntos = 0;
-int PuntosCorrectos[9] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
+int IndiceGanar = 7;
+int PuntosCorrectos[9] = {6, 7, 4,  1, 0, 3, 5, 0};
 
 int RadioPequeno = 5;
 int RadioGrande = 25;
@@ -52,7 +53,7 @@ int Activando = 0;
 int EstaVerde = 1;
 
 int TiempoPasado;
-int TiempoBonba = 7000;
+int TiempoBonba = 3000;
 int TiempoFalta;
 
 // millis()
@@ -60,6 +61,7 @@ int TiempoFalta;
 int X;
 int Y;
 int Z;
+
 void setup() {
   Pantalla.begin(0x9325); // Iniciamos el LCD especificando el controlador ILI9341.
   Pantalla.fillScreen(GREEN);
@@ -68,16 +70,39 @@ void setup() {
 }
 
 void loop() {
-  if ( HayDedo() && Activando == 0) {
+  if ( HayDedo()) {
     BuscandoDedo();
   }
 
   if (Activando == 1) {
-    BuscandoDedo();
     TiempoFalta = TiempoBonba - (millis() - TiempoPasado);
+    Serial.print("I ");
+    Serial.print(IndiceGanar);
+    Serial.print(" IP ");
+    Serial.println(IndicePuntos);
     if (TiempoFalta <= 0) {
+      Serial.println("Reiniciar");
+      if (IndiceGanar != IndicePuntos) {
+        PantallaError();
+      }
+      else {
+        for (int i = 0; i < IndicePuntos; i++) {
+          if (PuntosCorrectos[i] != Puntos[i]) {
+            PantallaError();
+            IndicePuntos = 0;
+            Activando = 0;
+            Pantalla.fillScreen(GREEN);
+            return;
+          }
+        }
+        //Aqui Encender
+        PantallaFelicidades();
+        //Apagar
+
+      }
       IndicePuntos = 0;
       Activando = 0;
+      Pantalla.fillScreen(GREEN);
     }
     for (int i = 0; i < IndicePuntos; i++) {
       Serial.print( Puntos[i]);
@@ -88,8 +113,63 @@ void loop() {
 
   ActualizarCirculos();
   ActualizarMouse();
+  ActualizarLineas();
   DibujarExtra();
   //delay(100);
+}
+
+void PantallaError() {
+  Pantalla.fillScreen(RED);
+  Pantalla.setCursor(20, 10);
+  Pantalla.setTextSize(7);
+  Pantalla.setTextColor(WHITE);
+  Pantalla.print("Error");
+  Pantalla.setCursor(20, 250);
+  Pantalla.setTextSize(5);
+  Pantalla.setTextColor(WHITE);
+  Pantalla.print("Espera");
+  for (int i = 5; i > 0; i--) {
+    Pantalla.fillRect(80, 150, 100, 100, RED);
+    Pantalla.setCursor(80, 150);
+    Pantalla.setTextSize(11);
+    Pantalla.setTextColor(WHITE);
+    Pantalla.print(i);
+    delay(1000);
+  }
+
+}
+
+
+void PantallaFelicidades() {
+  Pantalla.fillScreen(WHITE);
+  Pantalla.setCursor(20, 10);
+  Pantalla.setTextSize(7);
+  Pantalla.setTextColor(RED);
+  Pantalla.print("Abir");
+  Pantalla.setCursor(20, 250);
+  Pantalla.setTextSize(5);
+  Pantalla.setTextColor(RED);
+  Pantalla.print("Espera");
+  for (int i = 5; i > 0; i--) {
+    Pantalla.fillRect(80, 150, 100, 100, WHITE);
+    Pantalla.setCursor(80, 150);
+    Pantalla.setTextSize(11);
+    Pantalla.setTextColor(RED);
+    Pantalla.print(i);
+    delay(1000);
+  }
+
+}
+
+
+void ActualizarLineas() {
+  if ( IndicePuntos > 1) {
+    for (int i = 0; i < IndicePuntos - 1; i++) {
+      Pantalla.drawLine(PX[Puntos[i]], PY[Puntos[i]],
+                        PX[Puntos[i + 1]], PY[Puntos[i + 1]],
+                        BLACK);
+    }
+  }
 }
 
 void BuscandoDedo() {
@@ -97,12 +177,13 @@ void BuscandoDedo() {
     if (Distancia(PX[i], PY[i]) < RadioGrande) {
       for (int j = 0; j < IndicePuntos ; j++) {
         if (Puntos[j] == i)
-          return 0;
+          return;
       }
       TiempoPasado = millis();
       Activando = 1;
       Puntos[IndicePuntos] = i;
       IndicePuntos++;
+      return;
     }
   }
 }
@@ -125,12 +206,13 @@ void ActualizarMouse() {
   Y = map(p.y, TS_MAXY, TS_MINY, Pantalla.height(), 0);
   Z = p.z;
 
-  Serial.print("X");
-  Serial.print(X);
-  Serial.print(" Y");
-  Serial.print(Y);
-  Serial.print(" z");
-  Serial.println(Z);
+  /* Serial.print("X");
+    Serial.print(X);
+    Serial.print(" Y");
+    Serial.print(Y);
+    Serial.print(" z");
+    Serial.println(Z);
+  */
 
 }
 
