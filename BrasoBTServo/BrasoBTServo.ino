@@ -50,6 +50,28 @@ void loop()
     }
   }
   // Lee el  puerto serial del arduino y lo escrive en el puerto serial
-  if (Serial.available())
-    BTSerial.write(Serial.read());
+  while (Serial.available()) {
+    char Letra = Serial.read();
+    BTSerial.write(Letra);
+    if (Letra >= 'a' && Letra <= 'f') {
+      Serial.println("Encontro Letra");
+
+      Serial.println(Letra - 'a');
+      MoverServo = Letra - 'a';
+    }
+    else if (Letra >= '0' && Letra <= '9') {
+      GradoServo = GradoServo * 10 + int(Letra - '0');
+    }
+    else if (Letra == 'x') {
+      Servo[MoverServo].write(GradoServo);
+      if (MoverServo == 5) {
+        Servo[6].write(GradoServo);
+      }
+      Serial.println();
+      Serial.print("Servo ");
+      Serial.print(MoverServo);
+      Serial.print(" Grado ");
+      Serial.println(GradoServo);
+    }
+  }
 }
