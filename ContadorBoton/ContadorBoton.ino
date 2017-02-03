@@ -13,6 +13,8 @@ byte Digit[10][8] =
 };
 
 int Boton[3] = {A0, A1, A2};
+bool Estado = true;
+int k;
 
 void setup() {
   for (int i = 2; i < 13; i++)
@@ -25,13 +27,14 @@ void loop() {
   //CalculaDigitos(9999 - millis()/ 100);
   for (int i = 0; i < 3; i++) {
     if (digitalRead(Boton[i]) == 1)
-      while (1);
+      Estado = false;
   }
   int n = millis() / 1000 ;
   int segundos = n % 60  ;
   int minutos =  n / 60  ;
-
-  int k = minutos * 100 + segundos ;
+  if (Estado) {
+    k = minutos * 100 + segundos;
+  }
   CalculaDigitos(k) ;
 }
 
