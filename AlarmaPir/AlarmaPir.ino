@@ -1,8 +1,7 @@
 #include <LiquidCrystal.h>
-
 LiquidCrystal lcd(11, 12, 5, 4, 3, 2);
 
-int PinPir = 6;
+int PinPir = A0;
 int LedPin = 13;
 int Buzzer = 10;
 int Boton = 7;
@@ -13,7 +12,7 @@ void setup() {
   lcd.begin(16, 2);
   lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("Iniciando");
+  lcd.print("INICIANDO APLICACION!!");
   pinMode(Boton, INPUT);
   pinMode(PinPir, INPUT);
   pinMode(LedPin, OUTPUT);
@@ -24,20 +23,31 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(PinPir) == 1) {
+  int ValorSensor = analogRead(PinPir);
+  int ValorBoton = digitalRead(Boton);
+  
+  Serial.print("ValorSensor ");
+  Serial.print(ValorSensor);
+  Serial.print(" ValorBoton ");
+  Serial.println(ValorBoton);
+  
+  if (ValorSensor > 500) {
+    Serial.println("Intruso");
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("Intruso");
+    lcd.print("INTRUSO, INTRUSO!!");
     digitalWrite(Buzzer, 1);
     digitalWrite(LedPin, 1);
+
   }
 
-  if (digitalRead(Boton) == 1) {
+  if (ValorBoton == 1) {
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("xxx");
+    lcd.print("NO INTRUSO EN EL CECLA!!");
     digitalWrite(Buzzer, 0);
     digitalWrite(LedPin, 0);
+    delay(1000);
   }
-  delay(1000);
 }
+
