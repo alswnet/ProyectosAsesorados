@@ -4,8 +4,8 @@ const char* ssid     = "TURBONETT_ALSW"; //Nombre de la red
 const char* password = "2526-4897"; //Contraseña
 int PinLed = 5;
 int PinBuzzer = 12;
-int PinSensor =17;
-int PinBoton=0;
+int PinSensor = 17;
+int PinBoton = 0;
 
 boolean EstadoAlarma = false;
 boolean PublicarFacebook = false;
@@ -21,15 +21,15 @@ String Mensaje;
 void setup() {
   pinMode(PinLed, OUTPUT);
   pinMode(PinBuzzer, OUTPUT);
-  pinMode(PinSensor,OUTPUT);
+  pinMode(PinSensor, OUTPUT);
   pinMode(PinBoton, INPUT);
-pinMode(PinBoton, INPUT);
+  pinMode(PinBoton, INPUT);
   pinMode(PinLed, OUTPUT);
   //Inicializa la comunicacion Serial
   Serial.begin(115200);
   delay(100);
 
- 
+
   Serial.print("Intentando Conectar a: ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
@@ -54,12 +54,14 @@ pinMode(PinBoton, INPUT);
 }
 
 void loop() {
-  if (digitalRead(PinBoton) == 0) {
+  if (digitalRead(PinBoton) == 1 && !PublicarFacebook) {
     Serial.println("Iniciando FB");
     ConsultaFB();
+    PublicarFacebook = true;
     delay(500);
   }
-  else {
+  else if (digitalRead(PinBoton) == 0) {
+    PublicarFacebook = false;
     Serial.print("*");
     delay(100);
   }
@@ -79,17 +81,17 @@ void ConsultaFB() {
 
   Serial.println(Dato);
 
-    String Texto = ConsutaFacebook(Dato);
+  String Texto = ConsutaFacebook(Dato);
 
-    //Muestra datos y el Texto que recibimos
-    Serial.println(Texto);
-    Serial.print("Cantidad de texto ");
-    Serial.println(Texto.length());
-  }
+  //Muestra datos y el Texto que recibimos
+  Serial.println(Texto);
+  Serial.print("Cantidad de texto ");
+  Serial.println(Texto.length());
+}
 
-  //Funcion que hace la consulta a facebook a traves de la API Greap
-  //Es necesario enviar la URL a consultar ella devuelve la respuesta
-  String ConsutaFacebook(String URL) {
+//Funcion que hace la consulta a facebook a traves de la API Greap
+//Es necesario enviar la URL a consultar ella devuelve la respuesta
+String ConsutaFacebook(String URL) {
   String Texto = "\"error\"";
   //Valor Inicial
   Serial.println("\nEmpezando coneccion con el servidor...");
