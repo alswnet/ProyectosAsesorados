@@ -2,7 +2,13 @@
 
 const char* ssid     = "TURBONETT_ALSW"; //Nombre de la red
 const char* password = "2526-4897"; //Contraseña
+int PinLed = 5;
+int PinBuzzer = 12;
+int PinSensor =17;
+int PinBoton=0;
 
+boolean EstadoAlarma = false;
+boolean PublicarFacebook = false;
 const char*  server = "facebook.com";//Servidor
 String AccessToken = "EAACEdEose0cBAOgJJ7jbOM5OK9ZCXzkVMHuaL0vh9bB0TRCUsrv8cwmzbhvTLofoIshwqKmTX0GxaGjnrkPYErJQ4bNxJ0kOht9ZBBNN3y4idH6L2wpwP5qzGsdHqMVvPBRU7xWlZCIIb7MA5VERIuL57KtDZB8SlUvemtuHICiCEJg3r6DPPWjZBNz7ZAJBIZD";//Contraseña del greap API de facebook, cuidado caduze
 WiFiClientSecure client;//Cliente para contartar a facebook
@@ -11,16 +17,19 @@ WiFiClientSecure client;//Cliente para contartar a facebook
 String Dato;
 String Mensaje;
 
-int PinBoton = 0;
-int PinLed = 5;
 
 void setup() {
+  pinMode(PinLed, OUTPUT);
+  pinMode(PinBuzzer, OUTPUT);
+  pinMode(PinSensor,OUTPUT);
+  pinMode(PinBoton, INPUT);
+pinMode(PinBoton, INPUT);
+  pinMode(PinLed, OUTPUT);
   //Inicializa la comunicacion Serial
   Serial.begin(115200);
   delay(100);
 
-  pinMode(PinBoton, INPUT);
-  pinMode(PinLed, OUTPUT);
+ 
   Serial.print("Intentando Conectar a: ");
   Serial.println(ssid);
   WiFi.begin(ssid, password);
@@ -42,12 +51,6 @@ void setup() {
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
 
-  //Preparar la consulta para facebook
-  Dato = "POST https://graph.facebook.com/v2.9/";
-  Dato.concat("me/feed?");
-  Dato.concat("message=funciona3&access_token=");
-  Dato.concat(AccessToken);
-  Dato.concat(" HTTP/1.0");
 }
 
 void loop() {
@@ -65,17 +68,28 @@ void loop() {
 //Consulta a Facebook y verifica cual color es el ultimo
 //En base a la posicion del texto
 void ConsultaFB() {
-  String Texto = ConsutaFacebook(Dato);
+  //Preparar la consulta para facebook
+  Dato = "POST https://graph.facebook.com/v2.9/";
+  Dato.concat("me/feed?");
+  Dato.concat("message=@LuisParadaEscalante");
+  Dato.concat(millis());
+  Dato.concat("&access_token=");
+  Dato.concat(AccessToken);
+  Dato.concat(" HTTP/1.0");
 
-  //Muestra datos y el Texto que recibimos
-  Serial.println(Texto);
-  Serial.print("Cantidad de texto ");
-  Serial.println(Texto.length());
-}
+  Serial.println(Dato);
 
-//Funcion que hace la consulta a facebook a traves de la API Greap
-//Es necesario enviar la URL a consultar ella devuelve la respuesta
-String ConsutaFacebook(String URL) {
+    String Texto = ConsutaFacebook(Dato);
+
+    //Muestra datos y el Texto que recibimos
+    Serial.println(Texto);
+    Serial.print("Cantidad de texto ");
+    Serial.println(Texto.length());
+  }
+
+  //Funcion que hace la consulta a facebook a traves de la API Greap
+  //Es necesario enviar la URL a consultar ella devuelve la respuesta
+  String ConsutaFacebook(String URL) {
   String Texto = "\"error\"";
   //Valor Inicial
   Serial.println("\nEmpezando coneccion con el servidor...");
@@ -100,9 +114,12 @@ String ConsutaFacebook(String URL) {
     if (!client.connected()) {
       Serial.println();
       Serial.println("Desconectar del servidor");
-      client.stop();
     }
+    else {
+      Serial.print("no se conecto");
+    }
+    client.stop();
+
   }
   return Texto;
 }
-
