@@ -40,13 +40,15 @@ void loop() {
         confirmacion++;
       }
     }
-    if(confirmacion == 5)
+    if (confirmacion == 5)
     {
       Serial.println("clave correcta");
+      confirmacion = 0;
     }
     else
     {
       Serial.println("intruso");
+      confirmacion = 0;
     }
   }
 }
