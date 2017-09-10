@@ -3,8 +3,8 @@
 #include <SparkFunESP8266WiFi.h>
 
 //Configuracion de la red inalambrica
-const char ssid[] = "Manuel";
-const char password[] = "12345678";
+const char ssid[] = "Nexxt_ALSW_2.4GHz";
+const char password[] = "2526-4897";
 
 //Cadena usada para almacenar la ruta de la URL
 String rutaUrl;
@@ -41,10 +41,20 @@ Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS)
 
 void setup()
 {
-  IPAddress direccionIP;
-
   Serial.begin(9600); //inicializar puerto serie
+  ActivandoWifi();
+  ActivandoPines();
+}
 
+void loop()
+{
+  Teclado();
+  EstadoPir();
+  ActualizarLed();
+  ConsultaWifi();
+}
+
+void ActivandoPines() {
   Serial.println("Iniciando");
   for (int i = 0; i < 4; i++) {
     pinMode (Led[i], OUTPUT);
@@ -54,10 +64,23 @@ void setup()
   for (int i = 0; i < 2; i++) {
     pinMode (Pir[i], INPUT);
   }
+}
 
+void ActivandoWifi() {
+
+  IPAddress direccionIP;
   //Inicializa el modulo WiFi
   Serial.println("Activiando Wifi");
-  esp8266.begin();
+
+  int test = esp8266.begin();
+  if (test != true)
+  {
+    Serial.println(F("Error Encontrando el ESP8266."));
+    while (1);
+  }
+  Serial.println(F("ESP8266 Shield Encontrado"));
+
+
   esp8266.setMode(ESP8266_MODE_STA);  //Modo estacion (cliente WiFi)
 
 
@@ -81,21 +104,12 @@ void setup()
 
 }
 
-void loop()
-{
-  Teclado();
-  EstadoPir();
-  ActualizarLed();
-  ConsultaWifi();
-}
-
-
 void ConsultaWifi() {
   char c;
 
   //Espera un cliente el proximo medio segundo
-  cliente = server.available(500);
-
+  cliente = server.available(250);
+  // Serial.println(F("Buscando Cliente"));
   //Verifica si el cliente se conecto
   if (cliente) {
     Serial.println(F("Cliente conectado"));
@@ -104,9 +118,6 @@ void ConsultaWifi() {
       procesarCliente();
     }
   }
-
-
-
 }
 
 
@@ -135,15 +146,56 @@ void procesarCliente() {
         //Dependiendo de la URL solicitada, se enciende o apaga el LED
         //(Nota: Si no se especifica ninguna ruta valida, no se hace
         //nada con el LED)
+
+
         if (rutaUrl == "/Led0E") {
           EstadoLed[0] = true;
-          Serial.println("Led 1 Encender");
+          Serial.println("Led 0 Encender");
         }
         else if (rutaUrl == "/Led0P") {
           EstadoLed[0] = false;
-          Serial.println("Led 1 Apagado");
+          Serial.println("Led 0 Apagado");
         }
-
+        else if (rutaUrl == "/Led1E") {
+          EstadoLed[1] = true;
+          Serial.println(F("Led 1 Encender"));
+        }
+        else if (rutaUrl == "/Led1P") {
+          EstadoLed[1] = false;
+          Serial.println(F("Led 1 Apagado"));
+        }
+        else if (rutaUrl == "/Led2E") {
+          EstadoLed[2] = true;
+          Serial.println(F("Led 2 Encender"));
+        }
+        else if (rutaUrl == "/Led2P") {
+          EstadoLed[2] = false;
+          Serial.println(F("Led 2 Apagado"));
+        }
+        else if (rutaUrl == "/Led3E") {
+          EstadoLed[3] = true;
+          Serial.println(F("Led 3 Encender"));
+        }
+        else if (rutaUrl == "/Led3P") {
+          EstadoLed[3] = false;
+          Serial.println(F("Led 3 Apagado"));
+        }
+        else if (rutaUrl == "/Led4E") {
+          EstadoLed[4] = true;
+          Serial.println(F("Led 4 Encender"));
+        }
+        else if (rutaUrl == "/Led4P") {
+          EstadoLed[4] = false;
+          Serial.println(F("Led 4 Apagado"));
+        }
+        else if (rutaUrl == "/Apagar") {
+          EstadoAlarma = 0;
+          Serial.println(F("Apagar Alarma"));
+        }
+        else if (rutaUrl == "/Armar") {
+          EstadoAlarma = 1;
+          Serial.println(F("Armar Alarma"));
+        }
 
         //Despues de la solicitud siempre se pasa al siguiente estado
         estado = 2;
@@ -187,9 +239,17 @@ void enviarPagina() {
                               "Connection: close\r\n\r\n";
   const char cabeceraHTML[] = "<!DOCTYPE html>\n"
                               "<html>\n"
-                              "  <h1>Sistema Leslie </h1> ";
+                              "  <h1>Sistema Leslie </h1><br> ";
   const char TextoApagado[] = " Apagado ";
   const char TextoEncender[] = " Encendido ";
+
+  const char AlarmaPagada[] = "<h2> Alarma Apagada <h2>";
+  const char AlarmaArmada[] = "<h2> Alarma Armada <h2>";
+  const char AlarmaActivada[] = "<h2> Alarma Activada <h2>";
+
+  const char ApagarAlarma[] = "<a href=\"Apagar\"> Apagar Alarma <a>";
+  const char ArmarAlarma[] = "<a href=\"Armar\"> Armar Alarma <a>";
+
 
   const char Nombre0[] = "Conferencia 1: ";
   const char Nombre1[] = "Conferencia 2: ";
@@ -197,11 +257,14 @@ void enviarPagina() {
   const char Nombre3[] = "Entrada ";
 
   const char Numero0[] = "0";
+  const char Numero1[] = "1";
+  const char Numero2[] = "2";
+  const char Numero3[] = "3";
 
   const char EstadoActivo[] = "E";
   const char EstadoApagado[] = "P";
 
-  const char TextoA[] = " Link: <a href=\"/Led";
+  const char TextoA[] = " - Cambiar: <a href=\"/Led";
 
   const char TextoFinA[] = "\">";
   const char TextoCierre[] = " </a><br>\n";
@@ -212,23 +275,71 @@ void enviarPagina() {
   cliente.write(cabeceraHTML, strlen(cabeceraHTML));
 
   //El final de la pagina depende del estado del LED
-  if (EstadoLed[0] == true) {
-    cliente.write(Nombre0, strlen(Nombre0));
-    cliente.write(TextoEncender, strlen(TextoEncender));
-    cliente.write(TextoA, strlen(TextoA));
-    cliente.write(Numero0, strlen(Numero0));
-    cliente.write(EstadoApagado, strlen(EstadoApagado));
-    cliente.write(TextoFinA, strlen( TextoFinA));
-    cliente.write(TextoApagado, strlen(TextoApagado));
-    cliente.write(TextoCierre, strlen(TextoCierre));
-  }
-  else if (EstadoLed[0] == true) {
-    //Les apgado y a enceder
+  if ( EstadoAlarma == 0) {
+    //
+    // LED 0
+    //
+    if (EstadoLed[0] == true) {
+      cliente.write(Nombre0, strlen(Nombre0));
+      cliente.write(TextoEncender, strlen(TextoEncender));
+      cliente.write(TextoA, strlen(TextoA));
+      cliente.write(Numero0, strlen(Numero0));
+      cliente.write(EstadoApagado, strlen(EstadoApagado));
+      cliente.write(TextoFinA, strlen( TextoFinA));
+      cliente.write(TextoApagado, strlen(TextoApagado));
+      cliente.write(TextoCierre, strlen(TextoCierre));
+    }
+    else {
+      cliente.write(Nombre0, strlen(Nombre0));
+      cliente.write(TextoApagado, strlen(TextoApagado));
+      cliente.write(TextoA, strlen(TextoA));
+      cliente.write(Numero0, strlen(Numero0));
+      cliente.write(EstadoActivo, strlen(EstadoActivo));
+      cliente.write(TextoFinA, strlen( TextoFinA));
+      cliente.write(TextoEncender, strlen(TextoEncender));
+      cliente.write(TextoCierre, strlen(TextoCierre));
+    }
 
+    //
+    // LED 1
+    //
+    if (EstadoLed[1] == true) {
+      cliente.write(Nombre1, strlen(Nombre1));
+      cliente.write(TextoEncender, strlen(TextoEncender));
+      cliente.write(TextoA, strlen(TextoA));
+      cliente.write(Numero1, strlen(Numero1));
+      cliente.write(EstadoApagado, strlen(EstadoApagado));
+      cliente.write(TextoFinA, strlen( TextoFinA));
+      cliente.write(TextoApagado, strlen(TextoApagado));
+      cliente.write(TextoCierre, strlen(TextoCierre));
+    }
+    else {
+      cliente.write(Nombre1, strlen(Nombre1));
+      cliente.write(TextoApagado, strlen(TextoApagado));
+      cliente.write(TextoA, strlen(TextoA));
+      cliente.write(Numero1, strlen(Numero1));
+      cliente.write(EstadoActivo, strlen(EstadoActivo));
+      cliente.write(TextoFinA, strlen( TextoFinA));
+      cliente.write(TextoEncender, strlen(TextoEncender));
+      cliente.write(TextoCierre, strlen(TextoCierre));
+    }
   }
-  if (EstadoLed[1] == true) {
-    //hola
+
+
+  if (EstadoAlarma == 0) {
+    cliente.write(AlarmaPagada, strlen(AlarmaPagada));
+    cliente.write(ArmarAlarma, strlen(ArmarAlarma));
   }
+  else if (EstadoAlarma == 1) {
+    cliente.write(AlarmaArmada, strlen(AlarmaArmada));
+    cliente.write(ApagarAlarma, strlen(ApagarAlarma));
+  }
+  else if (EstadoAlarma == 2) {
+    cliente.write(AlarmaActivada, strlen(AlarmaActivada));
+    cliente.write(ApagarAlarma, strlen(ApagarAlarma));
+  }
+
+
   cliente.write(TextoFinHTML, strlen(TextoFinHTML));
 }
 
@@ -303,7 +414,7 @@ void ActualizarLed() {
 }
 
 void EstadoPir() {
-  if (EstadoAlarma = 1) {
+  if (EstadoAlarma == 1) {
     for (int i = 0; i < 2; i++) {
       int EstadoPir = digitalRead(Pir[i]);
       if (EstadoPir == 1) {
