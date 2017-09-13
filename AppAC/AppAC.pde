@@ -40,8 +40,8 @@ String valor = "";
 //
 boolean EstadoBoton = false;
 int Temperatura = 17;
-int TamanoPequeno = 30;
-int TamanoGrande = 60;
+int TamanoPequeno = 90;
+int TamanoGrande = 180;
 
 
 ////////////////////////////////////////////////////////
@@ -222,9 +222,11 @@ void muestraDatos() {
   }
   textSize(TamanoGrande);
   fill(0, 200, 0);
-  triangle(width/2, height/4, width - 50, height/2, 50, height/2);
-  text(Temperatura + "° C", width/2, (5*height)/8);
-  triangle(width/2, height, width - 50, (3*height)/4, 50, (3*height)/4);
+  if ( EstadoBoton) {
+    triangle(width/2, height/4, width - width/8, height/2,  width/8, height/2);
+    text(Temperatura + "° C", width/2, (5*height)/8);
+    triangle(width/2, height, width -  width/8, (3*height)/4,  width/8, (3*height)/4);
+  }
 }
 
 
@@ -235,54 +237,48 @@ void compruebaBoton() {
   String Mensaje ;
   byte[] Dato ;
   float Distancia = dist(mouseX, mouseY, width/2, height/8);
-  if (Distancia < (height/4-20)/2) {
-    EstadoBoton = !EstadoBoton;
-    if (EstadoBoton) {
-      Mensaje = "E";
-      Dato = Mensaje.getBytes();
-      ons.write(Dato);
-      //Enviar E
-    } else {
-      //Enviar A
-    }
-  }
-  if (mouseY > (height/4) && mouseY < (height/2)) {
-    Temperatura = Temperatura +1;
-    if (Temperatura > 30) {
-      Temperatura = 30;
-    }
-    //Enviar T
-  } else if (mouseY > (3*height)/4) {
-    Temperatura = Temperatura-1;
-    if (Temperatura < 17) {
-      Temperatura = 17;
-    }
-    //Enviar T
-  }
-
-
-  float dist = dist(mouseX, mouseY, width / 2, width / 2);
-  println( "Distancia "+dist+ " "+ width);
-  if (dist < (width  -100) /2 ) {
-    try {
-      println("Enviando Mensaje");
-      String Mensaje ;
-      byte[] Dato ;
-      if (EstadoBoton) {
-        Mensaje = "Hola\n";
-        Dato = Mensaje.getBytes();
-      } else {
-        Mensaje = "Adios\n";
-        Dato = Mensaje.getBytes();
-      }
+  try {
+    if (Distancia < (height/4-20)/2) {
+      println("boton precionado");
       EstadoBoton = !EstadoBoton;
-      ons.write(Dato);
+      if (EstadoBoton) {
+        Mensaje = "E\n";
+        Dato = Mensaje.getBytes();
+        ons.write(Dato);
+        //Enviar E
+      } else {
+        Mensaje = "A\n";
+        Dato = Mensaje.getBytes();
+        ons.write(Dato);
+      }
     }
-    catch(Exception ex) {
-      estado = 4;
-      error = ex.toString();
-      println(error);
+    if ( EstadoBoton) {
+      if (mouseY > (height/4) && mouseY < (height/2)) {
+        println("boton s");
+        Temperatura = Temperatura +1;
+        if (Temperatura > 30) {
+          Temperatura = 30;
+        }
+        Mensaje =""+Temperatura + "\n";
+        Dato = Mensaje.getBytes();
+        ons.write(Dato);
+        //Enviar T
+      } else if (mouseY > (3*height)/4) {
+        Temperatura = Temperatura-1;
+        if (Temperatura < 17) {
+          Temperatura = 17;
+        }
+        Mensaje =""+Temperatura + "\n";
+        Dato = Mensaje.getBytes();
+        ons.write(Dato);
+        //Enviar T
+      }
     }
+  }
+  catch(Exception ex) {
+    estado = 4;
+    error = ex.toString();
+    println(error);
   }
 }
 
