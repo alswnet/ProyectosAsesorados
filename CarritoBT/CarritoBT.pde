@@ -1,11 +1,8 @@
-boolean EstadoFondo = true;
-boolean Boton1 = false;
-
 float A  = width;
 float H  = height;
-
 float VX = 0;
 float VY = 0;
+
 void setup() {
   //size(400, 600);
   fullScreen();
@@ -30,4 +27,5 @@ void draw() {
 }
 
 void mouseReleased() {
+  println("Enviar");
 }
