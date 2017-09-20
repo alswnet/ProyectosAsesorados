@@ -55,6 +55,10 @@ void loop()
         delay(500);
         digitalWrite(PinesControl[2], 1);
         delay(500);
+        digitalWrite(PinesControl[2], 0);
+        delay(500);
+        Serial.print("T ");
+        Serial.println(Temperatura);
         Serial.println("Subiendo");
         Temperatura++;
       }
@@ -63,6 +67,10 @@ void loop()
         delay(500);
         digitalWrite(PinesControl[1], 1);
         delay(500);
+        digitalWrite(PinesControl[1], 0);
+        delay(500);
+        Serial.print("T ");
+        Serial.println(Temperatura);
         Serial.println("Bajando");
         Temperatura--;
       }
@@ -73,6 +81,7 @@ void loop()
       //Codigp para temperatura
     }
     else if (Mensaje == 'L' || Mensaje == 'l') {
+      //Camiar modo
       digitalWrite(PinesControl[3], 0);
       delay(500);
       digitalWrite(PinesControl[3], 1);
@@ -80,9 +89,9 @@ void loop()
       digitalWrite(PinesControl[3], 0);
       delay(500);
       Serial.println("Cambiando Mode");
-
     }
     else if (Mensaje == 'F' || Mensaje == 'f') {
+      //Bajar a la ultima temperatura
       for (int i = 0; i < 17; i++) {
         digitalWrite(PinesControl[1], 1);
         delay(500);
