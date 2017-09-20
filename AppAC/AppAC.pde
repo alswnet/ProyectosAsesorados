@@ -205,27 +205,26 @@ void conectaDispositivo() {
 ///////////////////////////////////////////////////////
 void muestraDatos() {   
   background(0);
+  textAlign(CENTER, CENTER);
+  textSize(TamanoPequeno*2);
   if ( EstadoBoton ) {
     fill(0, 200, 0);
-    ellipse(width/2, height/8, height/4-20, height/4-20);
-    fill(0);
-    textAlign(CENTER, CENTER);
-    textSize(TamanoPequeno);
-    text("Encendido", width/2, height/8);
   } else {
     fill(200, 0, 0);
-    ellipse(width/2, height/8, height/4-20, height/4-20);
-    fill(0);
-    textAlign(CENTER, CENTER);
-    textSize(TamanoPequeno);
-    text("Apagado", width/2, height/8);
   }
+  ellipse(width/4, height/8, height/5-20, height/5-20);
+  fill(0);
+  text("E/A", width/4, height/8);
+  fill(0, 50, 100);
+  ellipse(3*width/4, height/8, height/8, height/8);
+  fill(0);
+  text("M", 3*width/4, height/8);
   textSize(TamanoGrande);
   fill(0, 200, 0);
   if ( EstadoBoton) {
-    triangle(width/2, height/4, width - width/8, height/2,  width/8, height/2);
+    triangle(width/2, height/4, width - width/8, height/2, width/8, height/2);
     text(Temperatura + "° C", width/2, (5*height)/8);
-    triangle(width/2, height, width -  width/8, (3*height)/4,  width/8, (3*height)/4);
+    triangle(width/2, height, width -  width/8, (3*height)/4, width/8, (3*height)/4);
   }
 }
 
@@ -236,21 +235,20 @@ void muestraDatos() {
 void compruebaBoton() {
   String Mensaje ;
   byte[] Dato ;
-  float Distancia = dist(mouseX, mouseY, width/2, height/8);
+  float Distancia = dist(mouseX, mouseY, width/4, height/8);
+  float Distancia2 = dist(mouseX, mouseY, 3*width/4, height/8);
   try {
-    if (Distancia < (height/4-20)/2) {
+    if (Distancia < (height/5-20)/2) {
       println("boton precionado");
       EstadoBoton = !EstadoBoton;
-      if (EstadoBoton) {
-        Mensaje = "E\n";
-        Dato = Mensaje.getBytes();
-        ons.write(Dato);
-        //Enviar E
-      } else {
-        Mensaje = "A\n";
-        Dato = Mensaje.getBytes();
-        ons.write(Dato);
-      }
+      Mensaje = "A\n";
+      Dato = Mensaje.getBytes();
+      ons.write(Dato);
+    } else if (Distancia2 < height/16) {
+      println("boton modo");
+      Mensaje = "L\n";
+      Dato = Mensaje.getBytes();
+      ons.write(Dato);
     }
     if ( EstadoBoton) {
       if (mouseY > (height/4) && mouseY < (height/2)) {
