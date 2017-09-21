@@ -192,6 +192,10 @@ void conectaDispositivo() {
     ins = socket.getInputStream();     
     ons = socket.getOutputStream();     
     estado = 3;
+    String Mensaje = "G\n";
+    byte[]  Dato = Mensaje.getBytes();
+    ons.write(Dato);
+    //Aquimandar
   }   
   catch(Exception ex) {     
     estado = 4;     
@@ -203,7 +207,26 @@ void conectaDispositivo() {
 ////////////////////////////////////////////////////////
 //Muestra en la pantalla el boton y dato recibido 
 ///////////////////////////////////////////////////////
-void muestraDatos() {   
+void muestraDatos() {  
+  int Mensaje = -1;
+  try {     
+    if (ins.available() > 0) {
+      Mensaje  = ins.read();
+      println("Estado Actual"+Mensaje);
+      if (Mensaje == 49) {
+        EstadoBoton = true;
+        println("Ecendidad");
+      } else if (Mensaje == 48) {
+        EstadoBoton = false;
+        println("Apagado");
+      }
+    }
+  }
+  catch(Exception ex) {
+    estado = 4;
+    error = ex.toString();
+    println(error);
+  }
   background(0);
   textAlign(CENTER, CENTER);
   textSize(TamanoPequeno*2);
@@ -216,9 +239,14 @@ void muestraDatos() {
   fill(0);
   text("E/A", width/4, height/8);
   fill(0, 50, 100);
-  ellipse(3*width/4, height/8, height/8, height/8);
+  rect(3*width/4-width/8, 50, width/4, height/9-80, 50);
+  fill(132, 219, 249);
+  rect(3*width/4-width/8, height/8+50, width/4, height/9-80, 50);
+  // ellipse(3*width/4, height/8, height/8, height/8);
   fill(0);
-  text("M", 3*width/4, height/8);
+  text("M", 3*width/4, 13+ height/18);
+
+  text("17°", 3*width/4, 120+ height/8);
   textSize(TamanoGrande);
   fill(0, 200, 0);
   if ( EstadoBoton) {
@@ -236,7 +264,6 @@ void compruebaBoton() {
   String Mensaje ;
   byte[] Dato ;
   float Distancia = dist(mouseX, mouseY, width/4, height/8);
-  float Distancia2 = dist(mouseX, mouseY, 3*width/4, height/8);
   try {
     if (Distancia < (height/5-20)/2) {
       println("boton precionado");
@@ -244,7 +271,16 @@ void compruebaBoton() {
       Mensaje = "A\n";
       Dato = Mensaje.getBytes();
       ons.write(Dato);
-    } else if (Distancia2 < height/16) {
+    } else if (mouseX > 3*width/4-width/8 && mouseX < 3*width/4-width/8 +width/4 &&
+      mouseY > height/8+50  && mouseY<height/8+50+ height/9-80 ) {
+      println("Timpiratura minima");
+      Mensaje = "F\n";
+      Dato = Mensaje.getBytes();
+      ons.write(Dato);
+      EstadoBoton = true;
+      Temperatura = 17;
+    } else if (mouseX > 3*width/4-width/8 &&  mouseX < 3*width/4-width/8 + width/4 &&
+      mouseY > 50 && mouseY <50+height/9-80     ) {
       println("boton modo");
       Mensaje = "L\n";
       Dato = Mensaje.getBytes();
