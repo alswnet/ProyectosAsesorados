@@ -25,9 +25,6 @@ void setup() {
   pinMode (EV04, OUTPUT);
   pinMode (M03, OUTPUT);
   pinMode (banda, OUTPUT);
-
-
-
 }
 
 void loop() {
