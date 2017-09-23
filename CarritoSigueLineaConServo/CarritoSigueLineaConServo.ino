@@ -1,77 +1,105 @@
-int Motor1D = 5;
-int Motor2D = 6;
+#include <Servo.h>
 
-int Motor1I = 8;
-int Motor2I = 9;
+Servo myservo;
+int Motor1D = 8;
+int Motor2D = 2;
+
+int Motor1I = 5;
+int Motor2I = 6;
 
 int SensorI = 0;
 int SensorD = 0;
+int SensorU = 0;
 
-int vcc1 = 2;
-int vcc2 = 3;
-int gnd1 = 11;
-int gnd2 = 12;
+int velocidadI = 180;
+int velocidadD = 180;
+
 void setup() {
-  pinMode(vcc1, OUTPUT);
-  pinMode(vcc2, OUTPUT);
-  pinMode(gnd1, OUTPUT);
-  pinMode(gnd2, OUTPUT);
-  digitalWrite(vcc1, HIGH);
-  digitalWrite(vcc2, HIGH);
-  digitalWrite(gnd1, LOW);
-  digitalWrite(gnd2, LOW);
+  analogWrite(12, velocidadI);
+  analogWrite(11, velocidadD);
   pinMode(Motor1D, OUTPUT);
   pinMode(Motor2D, OUTPUT);
   pinMode(Motor1I, OUTPUT);
   pinMode(Motor2I, OUTPUT);
+  myservo.attach(7);
   Serial.begin(9600);
 }
 
 void loop() {
-  SensorI  = analogRead(A0);
-  SensorD = analogRead(A2);
-  if (SensorD < 500 && SensorI < 500) {
-    alto();
-  }
-  else if (SensorD > 500 && SensorI > 500) {
-    delante();
-  }
-  else if (SensorD > 500 && SensorI < 500) {
-    derecha();
-  }
-  else if (SensorD < 500 && SensorI > 500) {
-    izquierda();
-  }
-  else {
-    alto();
-  }
-  delay(1);
+    SensorI = analogRead(A0);
+    SensorD = analogRead(A2);
+    SensorU = analogRead(A4);
+//    Serial.println(SensorI);
+//    Serial.println(SensorD);
+//    Serial.println(SensorU);
+//    Serial.println("***************");
+//    delay(500);
+    if (SensorD < 600 && SensorI < 600) {
+      alto();
+    }
+    else if (SensorD > 600 && SensorI > 600) {
+      delante();
+    }
+    else if (SensorD > 600 && SensorI < 600) {
+      derecha();
+    }
+    else if (SensorD < 600 && SensorI > 600) {
+      izquierda();
+    }
+    else {
+      alto();
+    }
+    delay(1);
+//
+//  delante();
+//  delay(3000);
+//  alto();
+//  delay(500);
+//  derecha();
+//  delay(3000);
+//  alto();
+//  delay(500);
+//  izquierda();
+//  delay(3000);
+//  alto();
+//  delay(500);
+
+  //  if (analogRead(A3) > 600) {
+  //    alto();
+  //    delay(400);
+  //    myservo.write(110);
+  //    delay(1500);
+  //    myservo.write(10);
+  //    delay(100);
+  //    delante();
+  //    delay(200);
+  //  }
 }
 
 void alto() {
-  digitalWrite(Motor2D, LOW);
-  digitalWrite(Motor1D, LOW);
-  digitalWrite(Motor1I, LOW);
-  digitalWrite(Motor2I, LOW);
+  analogWrite(Motor2D, 0);
+  analogWrite(Motor1D, 0);
+  analogWrite(Motor1I, 0);
+  analogWrite(Motor2I, 0);
 }
 
 void delante() {
-  digitalWrite(Motor2D, HIGH);
-  digitalWrite(Motor1D, LOW);
-  digitalWrite(Motor1I, HIGH);
-  digitalWrite(Motor2I, LOW);
+  analogWrite(Motor2D, velocidadD);
+  analogWrite(Motor1D, 0);
+  analogWrite(Motor1I, 0);
+  analogWrite(Motor2I, velocidadI);
 }
 
 void izquierda() {
-  digitalWrite(Motor2D, HIGH);
-  digitalWrite(Motor1D, LOW);
-  digitalWrite(Motor1I, LOW);
-  digitalWrite(Motor2I, HIGH);
+  analogWrite(Motor2D, 0);
+  analogWrite(Motor1D, velocidadD);
+  analogWrite(Motor1I, 0);
+  analogWrite(Motor2I, velocidadI);
 }
 
 void derecha() {
-  digitalWrite(Motor2D, LOW);
-  digitalWrite(Motor1D, HIGH);
-  digitalWrite(Motor1I, HIGH);
-  digitalWrite(Motor2I, LOW);
+  analogWrite(Motor2D, velocidadD);
+  analogWrite(Motor1D, 0);
+  analogWrite(Motor1I, velocidadI);
+  analogWrite(Motor2I, 0);
 }
