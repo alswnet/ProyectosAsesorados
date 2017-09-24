@@ -11,6 +11,9 @@
 
 Servo myservo;
 
+int PinLed = 13;
+int BotonInicio = 3;
+
 int PinDelantero[2] = {8, 5};
 int PinTracero[2] = {2, 6};
 int PinVelocidad[2] = {9, 11};
@@ -26,6 +29,10 @@ int MinimoSensor[3] = {1024, 1024, 1024};
 
 void setup() {
 
+
+  Serial.begin(9600);
+  Serial.println("Iniciando");
+
   for (int i = 0; i < 3; i++) {
     pinMode(PinSensor[i], INPUT);
   }
@@ -36,13 +43,29 @@ void setup() {
     pinMode( PinVelocidad[i], OUTPUT);
   }
 
+  pinMode(PinLed , OUTPUT);
+  pinMode(BotonInicio, INPUT);
+
   myservo.attach(7);
-  Serial.begin(9600);
+
+  Serial.println("Esperando Boton");
+  while (true) {
+    int EstadoBoton = digitalRead(BotonInicio);
+    digitalWrite(PinLed, 1);
+    delay(300);
+    digitalWrite(PinLed, 0);
+    delay(300);
+    if (EstadoBoton == 1) {
+      Serial.println("Empezando a Segir Linea");
+      digitalWrite(PinLed, 0);
+      break;
+    }
+  }
 }
 
 void loop() {
   ActualizarEntradas();
-   Caminar(Atras,25, MotorIzquierdo);
+  Caminar(Atras, 25, MotorIzquierdo);
   Caminar(Adelante, 25, MotorDerecha);
 }
 
