@@ -11,9 +11,6 @@ const byte COLS = 3; //declaramos el uso de las 4 columnas y decimos que sera co
 #define segundo 1
 #define tercero 2
 #define cuarto 3
-#define empezar 0
-#define pausa 1
-#define reiniciar 2
 
 //Primer dijigo es nivel
 //Segundo digito es a b c d
