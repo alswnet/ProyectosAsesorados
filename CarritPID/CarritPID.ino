@@ -12,6 +12,7 @@
 Servo myservo;
 
 int Estado = 0;
+int Cambiar = 0;
 int PinLed = 13;
 int BotonInicio = 13;
 
@@ -70,15 +71,50 @@ void setup() {
 }
 
 void loop() {
-  ActualizarEntradas();
 
+
+  switch (Estado) {
+    case 0:
+      //Reto
+      Serial.print("-E0-");
+      VelocidadActual[MotorIzquierdo] = Velocidad[MotorIzquierdo];
+      VelocidadActual[MotorDerecha] = Velocidad[MotorDerecha];
+      if (EstadoSensor[Izquieda]) {
+        Estado = 2;
+      }
+      else if (EstadoSensor[Derecha]) {
+        Estado = 1;
+      }
+      break;
+    case 1:
+      Serial.print("-E1-");
+      //Salida por la derecha, regresar por la izquieda
+      VelocidadActual[MotorIzquierdo] = Velocidad[MotorIzquierdo];
+      VelocidadActual[MotorDerecha] = Velocidad[MotorDerecha] / 2;
+      if (EstadoSensor[Centro]) {
+        Estado = 0;
+      }
+      break;
+    case 2:
+      Serial.print("-E2-");
+      //Salida por la izquierda, regresar por la derecha
+      VelocidadActual[MotorIzquierdo] = Velocidad[MotorIzquierdo] / 2;
+      VelocidadActual[MotorDerecha] = Velocidad[MotorDerecha] ;
+      if (EstadoSensor[Centro]) {
+        Estado = 0;
+      }
+      break;
+  }
+  ActualizarEntradas();
+  BuscarBT();
 
   for (int i = 0; i < 2; i++) {
-    Serial.print(VelocidadActual[i] );
+    Serial.print(Velocidad[i] );
     Serial.print(" ");
   }
-  Caminar( VelocidadActual[0], MotorIzquierdo);
-  Caminar( VelocidadActual[1], MotorDerecha);
+
+  Caminar( Velocidad[0], MotorIzquierdo);
+  Caminar( Velocidad[1], MotorDerecha);
 }
 
 
@@ -106,7 +142,7 @@ void ActualizarEntradas() {
     } else if (ValorSensor[i] < MinimoSensor[i]) {
       MinimoSensor[i] = ValorSensor[i];
     }
-    if (ValorSensor[i] > (MaximoSensor[i] + MinimoSensor[i]) / 2) {
+    if (ValorSensor[i] >  MinimoSensor[i] + 2 * (MaximoSensor[i] - MinimoSensor[i]) / 3) {
       EstadoSensor[i] = true;
     }
     else {
@@ -117,7 +153,37 @@ void ActualizarEntradas() {
     Serial.print(" V:");
     Serial.print(ValorSensor[i]);
     Serial.print(" E:");
-    Serial.print(EstadoSensor[i]);
+    Serial.print(boolean(EstadoSensor[i]));
   }
   Serial.println();
+}
+
+void BuscarBT() {
+
+  while (Serial.available() > 0 ) {
+    char Letra = Serial.read();
+
+    if (Letra == 'v') {
+      Serial.println("Reiniciar Valor 0");
+      Cambiar = 1;
+      Velocidad[0] = 0;
+    } else if (Letra == 'V') {
+      Serial.println("Reiniciar Valor 1");
+      Cambiar = 2;
+      Velocidad[1] = 0;
+    } else if (Letra == '\n') {
+      Cambiar = 0;
+    }
+    if (Letra >= '0' && Letra <= '9') {
+      int Numero = int(Letra - '0');
+      switch (Cambiar) {
+        case 1:
+          Velocidad[0]  = Velocidad[0] * 10 + Numero;
+          break;
+        case 2:
+          Velocidad[1]  = Velocidad[1] * 10 + Numero;
+          break;
+      }
+    }
+  }
 }
