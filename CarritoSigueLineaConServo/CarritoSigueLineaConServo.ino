@@ -1,105 +1,109 @@
 #include <Servo.h>
 
+//Creando nombres Reservador
+#define Izquieda 0
+#define Centro 1
+#define Derecha 2
+#define Adelante 1
+#define Atras 0
+#define MotorIzquierdo 0
+#define MotorDerecha 1
+
 Servo myservo;
-int Motor1D = 8;
-int Motor2D = 2;
 
-int Motor1I = 5;
-int Motor2I = 6;
+int PinLed = 13;
+int BotonInicio = 3;
 
-int SensorI = 0;
-int SensorD = 0;
-int SensorU = 0;
+int PinDelantero[2] = {8, 5};
+int PinTracero[2] = {2, 6};
+int PinVelocidad[2] = {9, 11};
 
-int velocidadI = 180;
-int velocidadD = 180;
+int Velocidad[2] = {0, 0};
+int PinSensor[3] = {A0, A2, A4};
+
+int ValorSensor[3] = {0, 0, 0};
+boolean EstadoSensor[3] = {false, false, false};
+int PasadoSensor[3] = {0, 0, 0};
+int MaximoSensor[3] = {0, 0, 0};
+int MinimoSensor[3] = {1024, 1024, 1024};
 
 void setup() {
-  analogWrite(12, velocidadI);
-  analogWrite(11, velocidadD);
-  pinMode(Motor1D, OUTPUT);
-  pinMode(Motor2D, OUTPUT);
-  pinMode(Motor1I, OUTPUT);
-  pinMode(Motor2I, OUTPUT);
-  myservo.attach(7);
+
+
   Serial.begin(9600);
+  Serial.println("Iniciando");
+
+  for (int i = 0; i < 3; i++) {
+    pinMode(PinSensor[i], INPUT);
+  }
+
+  for (int i = 0; i < 2; i++) {
+    pinMode( PinDelantero[i], OUTPUT);
+    pinMode( PinTracero[i], OUTPUT);
+    pinMode( PinVelocidad[i], OUTPUT);
+  }
+
+  pinMode(PinLed , OUTPUT);
+  pinMode(BotonInicio, INPUT);
+
+  myservo.attach(7);
+
+  Serial.println("Esperando Boton");
+  while (true) {
+    int EstadoBoton = digitalRead(BotonInicio);
+    digitalWrite(PinLed, 1);
+    delay(300);
+    digitalWrite(PinLed, 0);
+    delay(300);
+    if (EstadoBoton == 1) {
+      Serial.println("Empezando a Segir Linea");
+      digitalWrite(PinLed, 0);
+      break;
+    }
+  }
 }
 
 void loop() {
-    SensorI = analogRead(A0);
-    SensorD = analogRead(A2);
-    SensorU = analogRead(A4);
-//    Serial.println(SensorI);
-//    Serial.println(SensorD);
-//    Serial.println(SensorU);
-//    Serial.println("***************");
-//    delay(500);
-    if (SensorD < 600 && SensorI < 600) {
-      alto();
+  ActualizarEntradas();
+  Caminar(Atras, 25, MotorIzquierdo);
+  Caminar(Adelante, 25, MotorDerecha);
+}
+
+
+void Caminar(int Direccion, int Velocidad, int Motor) {
+  if (Direccion == Adelante) {
+    digitalWrite(PinDelantero[Motor], 1);
+    digitalWrite(PinTracero[Motor], 0);
+    analogWrite(PinVelocidad[Motor], Velocidad);
+  }
+  else if (Direccion == Atras) {
+    digitalWrite(PinDelantero[Motor], 0);
+    digitalWrite(PinTracero[Motor], 1);
+    analogWrite(PinVelocidad[Motor], Velocidad);
+  }
+}
+
+void ActualizarEntradas() {
+  for (int i = 0; i < 3; i++) {
+    ValorSensor[i] = analogRead(PinSensor[i]);
+    if (ValorSensor[i] > MaximoSensor[i]) {
+      MaximoSensor[i] = ValorSensor[i];
     }
-    else if (SensorD > 600 && SensorI > 600) {
-      delante();
+    if (ValorSensor[i] < MinimoSensor[i]) {
+      MinimoSensor[i] = ValorSensor[i];
     }
-    else if (SensorD > 600 && SensorI < 600) {
-      derecha();
-    }
-    else if (SensorD < 600 && SensorI > 600) {
-      izquierda();
+    if (ValorSensor[i] > (MaximoSensor[i] + MinimoSensor[i]) / 2) {
+      EstadoSensor[i] = true;
     }
     else {
-      alto();
+      EstadoSensor[i] = false;
     }
-    delay(1);
-//
-//  delante();
-//  delay(3000);
-//  alto();
-//  delay(500);
-//  derecha();
-//  delay(3000);
-//  alto();
-//  delay(500);
-//  izquierda();
-//  delay(3000);
-//  alto();
-//  delay(500);
-
-  //  if (analogRead(A3) > 600) {
-  //    alto();
-  //    delay(400);
-  //    myservo.write(110);
-  //    delay(1500);
-  //    myservo.write(10);
-  //    delay(100);
-  //    delante();
-  //    delay(200);
-  //  }
-}
-
-void alto() {
-  analogWrite(Motor2D, 0);
-  analogWrite(Motor1D, 0);
-  analogWrite(Motor1I, 0);
-  analogWrite(Motor2I, 0);
-}
-
-void delante() {
-  analogWrite(Motor2D, velocidadD);
-  analogWrite(Motor1D, 0);
-  analogWrite(Motor1I, 0);
-  analogWrite(Motor2I, velocidadI);
-}
-
-void izquierda() {
-  analogWrite(Motor2D, 0);
-  analogWrite(Motor1D, velocidadD);
-  analogWrite(Motor1I, 0);
-  analogWrite(Motor2I, velocidadI);
-}
-
-void derecha() {
-  analogWrite(Motor2D, velocidadD);
-  analogWrite(Motor1D, 0);
-  analogWrite(Motor1I, velocidadI);
-  analogWrite(Motor2I, 0);
+    Serial.print("| S");
+    Serial.print(i);
+    Serial.print(" V:");
+    Serial.print(ValorSensor[i]);
+    Serial.print(" E:");
+    Serial.print(EstadoSensor[i]);
+  }
+  Serial.println();
 }
