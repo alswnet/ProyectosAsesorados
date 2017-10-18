@@ -28,6 +28,8 @@ int contra[5] = {7, 2, 3, 4, 1};      //Aqui cambias la clave
 int i = 0;
 int j = 0;
 
+int boton = 13;
+
 void setup() {
   Serial.begin(9600);
   lcd.begin(16, 2);
@@ -35,11 +37,42 @@ void setup() {
   pinMode(M1I , OUTPUT);
   pinMode(M2D , OUTPUT);
   pinMode(M2I , OUTPUT);
-
+  pinMode(boton, INPUT);
 }
 
 void loop() {
   char key = keypad.getKey();
+  if (digitalRead(boton) == 1) {
+    while (digitalRead(boton) == 1) {}
+    lcd.setCursor(0, 1);
+    lcd.print("Abriendo");
+    digitalWrite(M1D, HIGH);
+    digitalWrite(M1I, LOW);
+    digitalWrite(M2D, HIGH);
+    digitalWrite(M2I, LOW);
+    delay(5000);
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("Puede Salir");
+    digitalWrite(M1D, LOW);
+    digitalWrite(M1I, LOW);
+    digitalWrite(M2D, LOW);
+    digitalWrite(M2I, LOW);
+    delay(5000);
+    lcd.clear();
+    lcd.setCursor(0, 1);
+    lcd.print("Cerrando");
+    digitalWrite(M1D, LOW);
+    digitalWrite(M1I, HIGH);
+    digitalWrite(M2D, LOW);
+    digitalWrite(M2I, HIGH);
+    delay(5000);
+    digitalWrite(M1D, LOW);
+    digitalWrite(M1I, LOW);
+    digitalWrite(M2D, LOW);
+    digitalWrite(M2I, LOW);
+    lcd.clear();
+  }
   if (key != NO_KEY && i < 5 && key != '#' && key != '*') {       //Estructura if para guardar numeros en el vector y escribir en la LCD
     clave[i] = int(key - '0');
     lcd.setCursor(i, 0);
@@ -58,16 +91,28 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print("felicidades");
+      lcd.setCursor(0, 1);
+      lcd.print("Abriendo");
       digitalWrite(M1D, HIGH);
       digitalWrite(M1I, LOW);
       digitalWrite(M2D, HIGH);
       digitalWrite(M2I, LOW);
       delay(5000);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("felicidades");
+      lcd.setCursor(0, 1);
+      lcd.print("Puede Salir");
       digitalWrite(M1D, LOW);
       digitalWrite(M1I, LOW);
       digitalWrite(M2D, LOW);
       digitalWrite(M2I, LOW);
       delay(5000);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("felicidades");
+      lcd.setCursor(0, 1);
+      lcd.print("Cerrando");
       digitalWrite(M1D, LOW);
       digitalWrite(M1I, HIGH);
       digitalWrite(M2D, LOW);
