@@ -3,7 +3,7 @@
 SoftwareSerial GSMSerial(8, 9); // RX | TX Poner los pines que usas
 
 int temperatura = 3;
-
+int temperaturaPasada = 2;
 void setup() {
   // put your setup code here, to run once:
   GSMSerial.begin(9600);
@@ -11,8 +11,11 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  // Aqui codigo temperatura///
+  if (abs(temperatura - temperaturaPasada) > 5) {
+    mandarGSM();
+    temperaturaPasada = temperatura;
+  }
 }
 
 void mandarGSM() {
