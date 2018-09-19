@@ -10,6 +10,8 @@ int YS = 3;
 int YD = 6;
 int XS = 2;
 int XD = 5;
+int SD = 13;
+int SS = 12;
 int EN = 8;
 
 void setup() {
@@ -20,6 +22,8 @@ void setup() {
   pinMode(YD, OUTPUT);
   pinMode(XS, OUTPUT);
   pinMode(XD, OUTPUT);
+  pinMode(SS, OUTPUT);
+  pinMode(SD, OUTPUT);
   digitalWrite(EN, 0);
 
   Serial.begin(9600);
@@ -67,8 +71,10 @@ void ProcesarBluetooth(char letra) {
   }
   if ( letra == 'e' || letra == 'E' ) {
     mover (ZD, ZS , izquierda);
+    mover (SD, SS, izquierda);
   }
   else if ( letra == 'f' || letra == 'F' ) {
     mover (ZD, ZS, derecha);
+    mover (SD, SS , derecha);
   }
 }
