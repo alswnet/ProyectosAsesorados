@@ -1,0 +1,72 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>RECICLAJE AUTOMATIZADO</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
+  <script src="https://unpkg.com/ml5@0.0.3/dist/ml5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+
+
+  <style>
+    button {
+      margin: 2px;
+      padding: 4px;
+    }
+
+    video {
+      width: 300;
+      height: 300;
+    }
+
+    p {
+      display: inline;
+      font-size: 14px;
+    }
+
+    h6 {
+      margin: 4px;
+      font-weight: lighter;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="videoContainer"></div>
+  <h6 id="loading">Esperando a que la neurona este cargada</h6>
+  <p>
+
+    <button id="Botonvidrio">Entrenar vidrio</button>
+    <button id="Resetvidrio">Reiniciar vidrio</button>
+    <p><span id="Cantidadvidrio">0</span> Fotos de vidrio</p>
+    <p>| Confianza que sea vidrio: <span id="Confianzavidrio">0</span></p>
+    </br>
+    <button id="Botonplastico">Entrenar plastico</button>
+    <button id="Resetplastico">Reiniciar plastico</button>
+    <p><span id="Cantidadplastico">0</span> Fotos de plastico</p>
+    <p>| Confianza que sea plastico: <span id="Confianzaplastico">0</span></p>
+    </br>
+    <button id="Botonlata">Entrenar lata</button>
+    <button id="Resetlata">Reiniciar lata</button>
+    <p><span id="Cantidadlata">0</span> Fotos de lata</p>
+    <p>| Confianza que sea lata: <span id="Confianzalata">0</span></p>
+  </br>
+  <button id="Botonvacio">Entrenar vacio</button>
+  <button id="Resetvacio">Reiniciar vacio</button>
+  <p><span id="Cantidadvacio">0</span> Fotos de vacio</p>
+  <p>| Confianza que sea vacio: <span id="Confianzavacio">0</span></p>
+
+  </p>
+  <br/>
+  <h6>Entrenando Modelo: <button id="save">Salvar Modelo</button></h6>
+  <p>
+    <button id="buttonPredict">Iniciar Reconocimiento</button><br>Yo Creo Que Es: <span id="result">...</span>
+  </p>
+  <script src="sketch.js"></script>
+</body>
+
+</html>
