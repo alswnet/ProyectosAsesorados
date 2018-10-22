@@ -6,7 +6,7 @@
 
 const char* ssid = "ALSW";
 const char* password = "2526-4897";
-const char* mqtt_server = "iot.eclipse.org";
+const char* mqtt_server = "broker.mqtt-dashboard.com";
 int mqtt_port = 1883;
 
 WiFiClient espClient;
@@ -165,4 +165,3 @@ void callback(char* topic, byte* message, unsigned int length) {
     Serial.println(messageTMP);
   }
 }
-
