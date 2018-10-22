@@ -1,41 +1,43 @@
+
 // A function to be called when the model has been loaded
 function modelLoaded() {
   select('#loading').html('Modelo cargado neurona lista');
-  //knn.load('KNN-preload.json', updateExampleCounts); //AQUI PONER EL MODELO DESCARGADO EN LA PAGINA WEB,LA GUARDAMOS EN ESTA CARPETA Y DESCOMENTAMOS ESTALINEA PARA QUE SE EJECUTE
+  console.log("Modelo Cargado");
+//knn.load('test.json', updateExampleCounts); //AQUI PONER EL MODELO DESCARGADO EN LA PAGINA WEB,LA GUARDAMOS EN ESTA CARPETA Y DESCOMENTAMOS ESTALINEA PARA QUE SE EJECUTE
   //CARGA EL MODELO ANTERIOR.
 }
 
-const client = new Paho.MQTT.Client("ws://iot.eclipse.org/ws", "myClientId" + new Date().getTime());
-const myTopic = "itx/entrada";
-client.onConnectionLost = onConnectionLost;
-
-
-function onConnect() {
-  console.log("onConnect");
-  client.subscribe(myTopic);
-}
-
-function onConnectionLost(responseObject) {
-  if (responseObject.errorCode !== 0) {
-    console.log("onConnectionLost:" + responseObject.errorMessage);
-  }
-  client.connect({
-    onSuccess: onConnect
-  });
-}
 
 let knn;
 let video;
-client.connect({
-  onSuccess: onConnect
-});
+var client;
+const myTopic = "itx/entrada";
 
 function setup() {
+  console.log("iniciando programa");
   noCanvas();
   video = createCapture(VIDEO).parent('videoContainer');
   // Create a KNN Image Classifier
   knn = new ml5.KNNImageClassifier(2, 1, modelLoaded, video.elt);
+  client = new Paho.Client("broker.hivemq.com", 8000,"clientId-zPq1iZ3WW3");
+  // set callback handlers
+  client.onConnectionLost = onConnectionLost;
+  client.onMessageArrived = onMessageArrived;
+  // connect the client
+  client.connect({onSuccess:onConnect});
+
+
   createButtons();
+}
+
+// called when the client connects
+function onConnect() {
+  // Once a connection has been made, make a subscription and send a message.
+  console.log("onConnect con Mqtt");
+  client.subscribe(myTopic);
+  var message = new Paho.MQTT.Message("vacio prueva");
+  message.destinationName = topic;
+  client.send(message);
 }
 
 function createButtons() {
@@ -112,7 +114,6 @@ function createButtons() {
 }
 
 
-
 // Train the Classifier on a frame from the video.
 function train(category) {
   let msg;
@@ -145,7 +146,8 @@ function gotResults(results) {
   } else if (results.classIndex == 4) {
     msg = 'vacio';
   }
-  let message = new Paho.MQTT.Message(msg);
+  console.log("enviando mensaje" + msg);
+  let message = new Paho.Message(msg);
   message.destinationName = myTopic;
   client.send(message);
 
@@ -177,4 +179,31 @@ function updateExampleCounts() {
   select('#Cantidadlata').html(counts[3]);
   select('#Cantidadvacio').html(counts[4]);
 
+}
+
+//
+//mqtt
+
+
+
+// called when the client connects
+function onConnect() {
+  // Once a connection has been made, make a subscription and send a message.
+  console.log("onConnect");
+  client.subscribe("World");
+  message = new Paho.Message("vacio");
+  message.destinationName = "itx/entrada";
+  client.send(message);
+}
+
+// called when the client loses its connection
+function onConnectionLost(responseObject) {
+  if (responseObject.errorCode !== 0) {
+    console.log("onConnectionLost:"+responseObject.errorMessage);
+  }
+}
+
+// called when a message arrives
+function onMessageArrived(message) {
+  console.log("onMessageArrived:"+message.payloadString);
 }
