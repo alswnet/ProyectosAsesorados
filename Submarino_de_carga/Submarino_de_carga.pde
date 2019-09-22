@@ -1,7 +1,7 @@
 import ketai.ui.*;
 import ketai.net.bluetooth.*;
 
-PImage Fondo, BT, Flecha, Flecha2, Stop;
+PImage Fondo, BT, Flecha, Flecha2, Centro;
 
 KetaiBluetooth Bluetooth;
 ArrayList ListaBluetooth;
@@ -14,7 +14,7 @@ void setup() {
   BT = loadImage("bluetooth.png");
   Flecha = loadImage("Flecha.png");
   Flecha2 = loadImage("Flecha2.png");
-  Stop = loadImage("Stop.png");
+  Centro = loadImage("Stop.png");
 
   Bluetooth = new KetaiBluetooth(this);
 
@@ -30,7 +30,7 @@ void draw() {
   image(Fondo, 0, 0, width, height);
   imageMode(CENTER);
   image(Flecha2, TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
-  image(Stop, TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
+  image(Centro, TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
   image(Flecha, 2*TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
   image(BT, 3* TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
 }
