@@ -1,7 +1,7 @@
 import ketai.ui.*;
 import ketai.net.bluetooth.*;
 
-PImage Fondo, BT, Flecha, Flecha2;
+PImage Fondo, BT, Flecha, Flecha2, Stop;
 
 KetaiBluetooth Bluetooth;
 ArrayList ListaBluetooth;
@@ -14,6 +14,7 @@ void setup() {
   BT = loadImage("bluetooth.png");
   Flecha = loadImage("Flecha.png");
   Flecha2 = loadImage("Flecha2.png");
+  Stop = loadImage("Stop.png");
 
   Bluetooth = new KetaiBluetooth(this);
 
@@ -23,27 +24,31 @@ void setup() {
   ListaBluetooth.add("Cancelar");
 }
 
-
 void draw() {
-  float TamanoBoton = width/3;
+  float TamanoBoton = width/4;
   imageMode(CORNERS);
   image(Fondo, 0, 0, width, height);
   imageMode(CENTER);
-  image(Flecha2, TamanoBoton/2, height/2, TamanoBoton/2, TamanoBoton/2);
-  image(Flecha, TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/2, TamanoBoton/2);
-  image(BT, 2* TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/2, TamanoBoton/2);
+  image(Flecha2, TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
+  image(Stop, TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
+  image(Flecha, 2*TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
+  image(BT, 3* TamanoBoton + TamanoBoton/2, height/2, TamanoBoton/1.5, TamanoBoton/1.5);
 }
 
 void mousePressed() {
-  if (mouseX < width/3 && NombreBluetooth != null) {
+  if (mouseX < width/4 && NombreBluetooth != null) {
     println("Boton Izquierda");
     String MensajeBluetooth = "I";
     Bluetooth.writeToDeviceName(NombreBluetooth, MensajeBluetooth.getBytes());
-  } else if (mouseX < 2 * (width/3) && NombreBluetooth != null) {
+  } else if (mouseX < 2 * (width/4) && NombreBluetooth != null) {
     String MensajeBluetooth = "C";
     Bluetooth.writeToDeviceName(NombreBluetooth, MensajeBluetooth.getBytes());
+    println("Boton Centro");
+  } else if (mouseX < 3 * (width/4) && NombreBluetooth != null) {
+    String MensajeBluetooth = "D";
+    Bluetooth.writeToDeviceName(NombreBluetooth, MensajeBluetooth.getBytes());
     println("Boton Derecha");
-  } else if ( mouseX > 2 * (width/3) ) {
+  } else if ( mouseX > 4 * (width/4) ) {
     println("Boton BT");
     KetaiList MenuBluetooth = new KetaiList(this, ListaBluetooth);
   }
