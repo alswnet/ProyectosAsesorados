@@ -12,19 +12,20 @@ int VminSensor = 1024;
 int VactSensor;
 int VanteriorSensor = 0;
 
-
 //Cambiar valor segun fuenta de filtro
 //Rango de 0-1
 //Valores aproximandose a 0 siguen menos la linea real
 //Valores aproximandose a 1 siguien la linea real
-float FuerzaFiltro = 0.01;
+float FuerzaFiltro = 0.05;
 
 void setup() {
-  pinMode(PinSensor, OUTPUT);
+  pinMode(PinSensor, INPUT);
   for (int i = 0; i < 5; i++ ) {
     Dedo[i].attach(PinServo[i]);
   }
   Serial.begin(115200);
+  delay(1000);
+  VanteriorSensor = analogRead(PinSensor);
 }
 
 void loop() {
@@ -32,12 +33,16 @@ void loop() {
   Serial.print(VactSensor);
   Serial.print(",");
   VactSensor = FiltroPasaBajo(VactSensor);
-  Serial.println(VactSensor);
+  Serial.print(VactSensor);
+  Serial.print(",");
+  Serial.print(VMaxSensor);
+  Serial.print(",");
+  Serial.println(VminSensor);
   if (VactSensor > VMaxSensor) {
     VMaxSensor = VactSensor;
   }
 
-  if (VactSensor < VminSensor) {
+  if (VminSensor > VactSensor) {
     VminSensor = VactSensor;
   }
 
