@@ -1,15 +1,4 @@
-#include <Servo.h>
-
-int PinServo[5] = {A0, A1, A2, A3, A4};
-int Pmax[5] = {180, 180, 180, 180, 180};
-int Pmin[5] = {0, 0, 0, 0, 0};
-int Pactual[5] = {90, 90, 90, 90, 90};
-
 int PinSensor = A5;
-int VMaxSensor = 0;
-int VminSensor = 1024;
-int VactSensor;
-int VanteriorSensor = 0;
 
 //Cambiar valor segun fuenta de filtro
 //Rango de 0-1
