@@ -6,11 +6,10 @@ int Pmin[5] = {0, 0, 0, 0, 0};
 int Pactual[5] = {90, 90, 90, 90, 90};
 Servo Dedo[5];
 
-int PinSensor = A5;
 int VMaxSensor = 0;
 int VminSensor = 1024;
-int VactSensor;
-int VanteriorSensor = 0;
+int VactSensor = 0;
+int VanteriorSensor = -1;
 
 //Cambiar valor segun fuenta de filtro
 //Rango de 0-1
@@ -19,29 +18,16 @@ int VanteriorSensor = 0;
 float FuerzaFiltro = 0.05;
 
 void setup() {
-  pinMode(PinSensor, INPUT);
   for (int i = 0; i < 5; i++ ) {
     Dedo[i].attach(PinServo[i]);
   }
   Serial.begin(115200);
   delay(1000);
-  VanteriorSensor = analogRead(PinSensor);
+
 }
 
 void loop() {
-  VactSensor = analogRead(PinSensor);
-  Serial.print(VactSensor);
-  Serial.print(",");
-  VactSensor = FiltroPasaBajo(VactSensor);
-  Serial.print(VactSensor);
-  Serial.print(",");
-  Serial.print(VMaxSensor);
-  Serial.print(",");
-  Serial.print(VminSensor);
-  Serial.print(",");
-  Serial.print(Pactual[4]);
-  Serial.println();
-
+  DecodificarSerial();
 
   if (VactSensor > VMaxSensor) {
     VMaxSensor = VactSensor;
@@ -64,4 +50,21 @@ void loop() {
 int FiltroPasaBajo(int Valor) {
   VanteriorSensor = FuerzaFiltro * Valor + (1 - FuerzaFiltro) * VanteriorSensor;
   return VanteriorSensor;
+}
+
+void DecodificarSerial() {
+  // Mensaje de la forma M1/30
+  // Donde M1 Es motor 1
+  // 30 el valor
+  String Mensaje = Serial.readStringUntil('\n');
+  int PosicionPleca = Mensaje.indexOf(',');
+  int PosicionSaltoLinea = Mensaje.length();
+  String Dato = Mensaje.substring(0, PosicionPleca);
+  int Valor = Mensaje.substring(PosicionPleca + 1, PosicionSaltoLinea).toInt();
+  if (Dato.equals("V")) {
+    VactSensor = Valor;
+    if (VanteriorSensor < 0) {
+      VanteriorSensor = Valor;
+    }
+  }
 }
