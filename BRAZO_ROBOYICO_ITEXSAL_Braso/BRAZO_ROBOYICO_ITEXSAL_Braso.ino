@@ -28,14 +28,25 @@ void setup() {
 }
 
 void loop() {
+
+  Serial.print(VactSensor);
+  Serial.print(",");
+  Serial.print(VMaxSensor);
+  Serial.print(",");
+  Serial.print(VminSensor);
+  Serial.print(",");
+  Serial.print(Pactual[0]);
+  Serial.println();
   DecodificarSerial();
 
   if (VactSensor > VMaxSensor) {
-    VMaxSensor = VactSensor;
+    VMaxSensor = FiltroPasaBajo(VactSensor, VMaxSensor);
+    // VMaxSensor = VactSensor;
   }
 
   if (VminSensor > VactSensor) {
-    VminSensor = VactSensor;
+    VMaxSensor = FiltroPasaBajo(VactSensor, VminSensor);
+    // VminSensor = VactSensor;
   }
 
   for (int i = 0; i < 5; i++) {
@@ -44,7 +55,7 @@ void loop() {
 
   for (int i = 0; i < 5; i++) {
     //if (abs(Ppasado[i] - Pactual[i]) > 5) {
-      Dedo[i].write(Pactual[i]);
+    Dedo[i].write(Pactual[i]);
     //  Ppasado[i] = Pactual[i];
     //}
   }
@@ -52,6 +63,10 @@ void loop() {
   delay(15);
 }
 
+int FiltroPasaBajo(int Valor , int ValorAnteior) {
+  int  VanteriorSensor = FuerzaFiltro * Valor + (1 - FuerzaFiltro) * ValorAnteior;
+  return VanteriorSensor;
+}
 
 void DecodificarSerial() {
   // Mensaje de la forma M1/30
