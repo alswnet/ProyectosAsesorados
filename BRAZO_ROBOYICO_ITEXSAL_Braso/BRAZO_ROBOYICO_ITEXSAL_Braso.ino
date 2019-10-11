@@ -4,6 +4,7 @@ int PinServo[5] = {A0, A1, A2, A3, A4};
 int Pmax[5] = {180, 180, 180, 180, 180};
 int Pmin[5] = {0, 0, 0, 0, 0};
 int Pactual[5] = {90, 90, 90, 90, 90};
+int Ppasado[5] = {90, 90, 90, 90, 90};
 Servo Dedo[5];
 
 int VMaxSensor = 0;
@@ -42,8 +43,12 @@ void loop() {
   }
 
   for (int i = 0; i < 5; i++) {
-    Dedo[i].write(Pactual[i]);
+    if (abs(Ppasado[i] - Pactual[i]) < 5) {
+      Dedo[i].write(Pactual[i]);
+      Ppasado[i] = Pactual[i];
+    }
   }
+
   delay(15);
 }
 
