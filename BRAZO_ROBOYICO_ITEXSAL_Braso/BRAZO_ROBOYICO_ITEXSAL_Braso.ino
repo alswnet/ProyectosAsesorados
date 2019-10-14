@@ -67,10 +67,10 @@ void loop() {
   }
 
   for (int i = 0; i < 5; i++) {
-    if (abs(Ppasado[i] - Pactual[i]) > 5) {
-      Dedo[i].write(Pactual[i]);
-      Ppasado[i] = Pactual[i];
-    }
+    // if (abs(Ppasado[i] - Pactual[i]) > 5) {
+    Dedo[i].write(Pactual[i]);
+    //   Ppasado[i] = Pactual[i];
+    // }
   }
 
   delay(15);
