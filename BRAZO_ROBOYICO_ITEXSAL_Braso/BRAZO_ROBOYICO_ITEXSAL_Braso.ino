@@ -10,6 +10,7 @@ Servo Dedo[5];
 int VMaxSensor = 0;
 int VminSensor = 1024;
 int VactSensor = 0;
+int ValorSuperar = 500;
 
 //Cambiar valor segun fuenta de filtro
 //Rango de 0-1
@@ -24,40 +25,52 @@ void setup() {
   }
   Serial.begin(115200);
   delay(1000);
-
 }
 
 void loop() {
 
-  Serial.print(VactSensor);
-  Serial.print(",");
-  Serial.print(VMaxSensor);
-  Serial.print(",");
-  Serial.print(VminSensor);
-  Serial.print(",");
-  Serial.print(Pactual[0]);
-  Serial.println();
+  /* Serial.print(VactSensor);
+    Serial.print(",");
+    Serial.print(VMaxSensor);
+    Serial.print(",");
+    Serial.print(VminSensor);
+    Serial.print(",");
+    Serial.print(Pactual[0]);
+    Serial.println();
+  */
   DecodificarSerial();
 
-  if (VactSensor > VMaxSensor) {
-    VMaxSensor = FiltroPasaBajo(VactSensor, VMaxSensor);
-    // VMaxSensor = VactSensor;
-  }
+  /*
+    if (VactSensor > VMaxSensor) {
+      VMaxSensor = FiltroPasaBajo(VactSensor, VMaxSensor);
+      // VMaxSensor = VactSensor;
+    }
 
-  if (VminSensor > VactSensor) {
-    VMaxSensor = FiltroPasaBajo(VactSensor, VminSensor);
-    // VminSensor = VactSensor;
-  }
+    if (VminSensor > VactSensor) {
+      VMaxSensor = FiltroPasaBajo(VactSensor, VminSensor);
+      // VminSensor = VactSensor;
+    }
 
-  for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; i++) {
     Pactual[i] = map(VactSensor, VminSensor, VMaxSensor, Pmin[i], Pmax[i]);
+    }
+  */
+
+  if (VactSensor > ValorSuperar) {
+    for (int i = 0; i < 5; i++) {
+      Pactual[i] = Pmax[i];
+    }
+  } else {
+    for (int i = 0; i < 5; i++) {
+      Pactual[i] = Pmin[i];
+    }
   }
 
   for (int i = 0; i < 5; i++) {
-    //if (abs(Ppasado[i] - Pactual[i]) > 5) {
-    Dedo[i].write(Pactual[i]);
-    //  Ppasado[i] = Pactual[i];
-    //}
+    if (abs(Ppasado[i] - Pactual[i]) > 5) {
+      Dedo[i].write(Pactual[i]);
+      Ppasado[i] = Pactual[i];
+    }
   }
 
   delay(15);
